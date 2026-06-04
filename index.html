@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReelCraft - Turn products into social videos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="logo" href="#">
+          <span class="logo-mark"><i></i><i></i></span>
+          <span>ReelCraft</span>
+        </a>
+
+        <nav class="primary-nav">
+          <a class="nav-item active" href="#creator-panel" data-nav-target="creator-panel"><span class="nav-icon">✦</span>Create video</a>
+          <a class="nav-item" href="#projects-section" data-nav-target="projects-section"><span class="nav-icon">▣</span>My projects</a>
+          <a class="nav-item" href="#"><span class="nav-icon">▱</span>Brand kit</a>
+          <a class="nav-item" href="#"><span class="nav-icon">⌁</span>Inspiration</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <button class="upgrade-card">
+            <span class="upgrade-icon">✦</span>
+            <span>
+              <b>Unlock more creations</b>
+              <small>Upgrade your plan</small>
+            </span>
+            <em>→</em>
+          </button>
+          <a class="nav-item" href="#"><span class="nav-icon">?</span>Help center</a>
+          <a class="nav-item" href="#"><span class="nav-icon">⚙</span>Settings</a>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div class="breadcrumb"><span>Studio</span><b>/</b><strong>New video</strong></div>
+          <div class="account-actions">
+            <button class="credits"><span>✦</span><b id="credit-count">12</b> credits</button>
+            <button id="open-auth-modal" class="login-btn">Log in</button>
+            <button id="account-avatar" class="avatar" hidden>JS</button>
+          </div>
+        </header>
+
+        <section class="workspace">
+          <div class="hero">
+            <div>
+              <p class="eyebrow">AI PRODUCT VIDEO STUDIO</p>
+              <h1>Turn any product into<br><span>scroll-stopping</span> video.</h1>
+              <p class="hero-copy">Drop a Shopify product link. ReelCraft pulls your listing details and images, then turns the strongest angles into ready-to-post videos.</p>
+            </div>
+            <div class="hero-orbit">
+              <span class="orbit-label orbit-label-one">UGC script</span>
+              <span class="orbit-label orbit-label-two">9:16</span>
+              <div class="hero-play"><span>▶</span></div>
+            </div>
+          </div>
+
+          <section id="creator-panel" class="creator-panel">
+            <div class="stepper">
+              <div class="step active"><b>1</b><span>Add product</span></div>
+              <div class="step-line"></div>
+              <div class="step"><b>2</b><span>Pick a concept</span></div>
+              <div class="step-line"></div>
+              <div class="step"><b>3</b><span>Generate video</span></div>
+            </div>
+
+            <div id="input-stage" class="stage active">
+              <div class="stage-heading">
+                <div>
+                  <h2>What are we selling today?</h2>
+                  <p>Paste a public Shopify product page to load its real listing data.</p>
+                </div>
+                <span class="secure-badge">⌁ Secure analysis</span>
+              </div>
+
+              <form id="product-form" class="url-form">
+                <div class="url-field">
+                  <span class="link-icon">↗</span>
+                  <input id="product-url" type="url" value="https://www.allbirds.com/products/mens-tree-runners" placeholder="Paste your Shopify product link here..." required>
+                  <button id="analyze-btn" type="submit">Analyze product <span>→</span></button>
+                </div>
+                <p class="form-hint">Shopify product parsing is live. Paste a public Shopify product page.</p>
+                <p id="form-error" class="form-error" role="alert"></p>
+              </form>
+
+              <div class="platform-row">
+                <span>Works with</span>
+                <b class="shopify">shopify <i>LIVE</i></b>
+                <b class="coming-soon">amazon <i>SOON</i></b>
+                <b class="coming-soon">TikTok Shop <i>SOON</i></b>
+                <b class="webstore">◎ More storefronts soon</b>
+              </div>
+            </div>
+
+            <div id="loading-stage" class="stage loading-stage">
+              <div class="loading-wrap">
+                <div class="scanner">
+                  <div class="scan-box"></div>
+                  <div class="scan-line"></div>
+                  <span>✦</span>
+                </div>
+                <h2>Reading your product story...</h2>
+                <p id="loading-message">Pulling images and product details</p>
+                <div class="loading-bar"><i id="loading-progress"></i></div>
+              </div>
+            </div>
+
+            <div id="concept-stage" class="stage">
+              <div class="analysis-report">
+                <div class="report-header">
+                  <div>
+                    <div class="section-label"><span>✦</span> PRODUCT INTELLIGENCE REPORT</div>
+                    <h2>We found the angles worth selling.</h2>
+                    <p>Storefront facts and explainable content signals, organized for video creation.</p>
+                  </div>
+                  <div class="report-score">
+                    <span>LISTING HEALTH</span>
+                    <b id="listing-health">Strong</b>
+                    <small>Based on listing completeness</small>
+                  </div>
+                </div>
+
+                <div class="report-grid">
+                  <div class="product-overview">
+                    <div class="report-label"><span>01</span> LIVE STOREFRONT DATA</div>
+                  <div class="product-card">
+                    <img id="product-image" src="https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=360&q=80" alt="Product">
+                    <div>
+                      <span id="product-source" class="source-pill">shopify</span>
+                      <h3 id="product-title">Shopify product</h3>
+                      <p id="product-summary">Product details</p>
+                      <div class="rating"><b id="product-price">Live data</b><span id="product-variants"></span></div>
+                    </div>
+                  </div>
+                    <div class="fact-grid">
+                      <div><small>PRICE RANGE</small><b id="fact-price">—</b></div>
+                      <div><small>AVAILABILITY</small><b id="fact-stock">—</b></div>
+                      <div><small>MEDIA ASSETS</small><b id="fact-assets">—</b></div>
+                      <div><small>DESCRIPTION</small><b id="fact-description">—</b></div>
+                    </div>
+                    <h4>Catalog signals</h4>
+                  <div id="product-tags" class="tags"></div>
+                    <div id="product-options" class="option-list"></div>
+                  <blockquote id="review-status">Reviews are not included in Shopify's standard product endpoint.</blockquote>
+                  </div>
+
+                  <div class="derived-insights">
+                    <div class="report-label"><span>02</span> DERIVED INSIGHTS</div>
+                    <section class="insight-section">
+                      <h3>Sellable product angles</h3>
+                      <p>Signals extracted from the storefront copy and catalog structure.</p>
+                      <div id="selling-points" class="selling-points"></div>
+                    </section>
+                    <section class="insight-section">
+                      <h3>Recommended content plan</h3>
+                      <p>Practical directions for the first batch of short-form videos.</p>
+                      <ol id="content-opportunities" class="opportunity-list"></ol>
+                    </section>
+                    <div class="analysis-note"><span>✓</span><p><b>Explainable analysis</b><br>Insights are derived from the live listing. Review intelligence will appear after a review provider is connected.</p></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="concept-picker">
+                  <div class="section-label"><span>03</span> CHOOSE YOUR CREATIVE ANGLE</div>
+                  <h2>Three hooks, ready to create.</h2>
+                  <p>Each concept is grounded in the product analysis above. Pick a direction for your first cut.</p>
+                  <div id="concept-list" class="concept-list"></div>
+                  <div class="engine-picker">
+                    <button class="engine-card selected" data-engine="starter">
+                      <span class="engine-icon">✓</span>
+                      <span><b>Starter · Free</b><small>15s animated product video · Local MP4 export</small></span>
+                      <em>FREE</em>
+                    </button>
+                    <button class="engine-card" data-engine="seedance">
+                      <span class="engine-icon">✦</span>
+                      <span><b>Seedance 2.0 · Premium</b><small>5s AI clip · Powered through Seegen</small></span>
+                      <em>PREMIUM</em>
+                    </button>
+                  </div>
+                  <div class="generation-options">
+                    <button><small>FORMAT</small><b>9:16 Vertical⌄</b></button>
+                    <button><small>DURATION</small><b id="duration-value">15 seconds⌄</b></button>
+                    <button><small>LANGUAGE</small><b>English (US)⌄</b></button>
+                    <button id="generate-btn" class="generate-btn">Generate free video <span>FREE</span></button>
+                  </div>
+              </div>
+            </div>
+
+            <div id="result-stage" class="stage">
+              <div class="result-layout">
+                <div class="video-preview">
+                  <div class="video-frame">
+                    <img id="video-placeholder" src="https://images.unsplash.com/photo-1602523961358-f9f03dd557db?auto=format&fit=crop&w=720&q=85" alt="Video preview placeholder">
+                    <video id="generated-video" controls playsinline hidden></video>
+                    <div class="video-gradient"></div>
+                    <span class="scene-pill">SCENE 01 · HOOK</span>
+                    <div class="video-caption">POV: your home suddenly<br>feels like a <em>boutique hotel</em></div>
+                    <button class="preview-play">▶</button>
+                    <div class="timeline"><i></i></div>
+                  </div>
+                </div>
+                <div class="result-details">
+                  <div id="result-pill" class="success-pill">✓ VIDEO GENERATED</div>
+                  <h2 id="result-title">Your product video is ready.</h2>
+                  <p id="result-description">Generated locally from your Shopify listing with animated product scenes, selling-point captions, and a closing CTA.</p>
+                  <div class="result-meta">
+                    <div><small>FORMAT</small><b>9:16 Vertical</b></div>
+                    <div><small>LENGTH</small><b id="result-length">00:15</b></div>
+                    <div><small>TYPE</small><b id="result-type">Starter Free MP4</b></div>
+                  </div>
+                  <a id="result-download" class="primary-wide result-action" href="#" download>Download MP4 <span>↓</span></a>
+                  <button id="another-btn" class="secondary-wide">＋ Create another version</button>
+                  <small id="generation-note" class="seedance-note">✓ Generated locally with Starter Free</small>
+                  <section id="publish-panel" class="publish-panel" hidden>
+                    <div class="publish-heading">
+                      <div>
+                        <small>TIKTOK PUBLISHING PACKAGE</small>
+                        <h3>Publish plan</h3>
+                      </div>
+                      <span id="publish-status">Draft</span>
+                    </div>
+
+                    <div class="publish-steps">
+                      <section class="publish-step">
+                        <div class="publish-step-title"><b>1</b><span>Post copy</span></div>
+                        <label class="publish-field">
+                          <span>Caption</span>
+                          <textarea id="publish-caption"></textarea>
+                        </label>
+                        <label class="publish-field">
+                          <span>Hashtags</span>
+                          <input id="publish-hashtags" type="text">
+                        </label>
+                      </section>
+
+                      <section class="publish-step">
+                        <div class="publish-step-title"><b>2</b><span>Audience and schedule</span></div>
+                        <div class="publish-row">
+                          <label class="publish-field">
+                            <span>Privacy</span>
+                            <select id="publish-privacy">
+                              <option value="public">Public</option>
+                              <option value="friends">Friends</option>
+                              <option value="private">Private</option>
+                            </select>
+                          </label>
+                          <label class="publish-field">
+                            <span>Schedule time</span>
+                            <input id="publish-scheduled-at" type="datetime-local">
+                          </label>
+                        </div>
+                        <div class="publish-toggles">
+                          <label><input id="publish-comments" type="checkbox"> Comments</label>
+                          <label><input id="publish-duet" type="checkbox"> Duet</label>
+                          <label><input id="publish-stitch" type="checkbox"> Stitch</label>
+                        </div>
+                      </section>
+
+                      <section class="publish-step">
+                        <div class="publish-step-title"><b>3</b><span>Final checks</span></div>
+                        <ul id="publish-checklist" class="publish-checklist"></ul>
+                        <div class="publish-actions">
+                          <button id="save-publish-draft" class="secondary-wide">Save draft</button>
+                          <button id="schedule-publish" class="primary-wide">Schedule post</button>
+                        </div>
+                      </section>
+                    </div>
+                    <small class="publish-note">TikTok direct posting requires OAuth and Content Posting API approval. This MVP saves the publish package and schedule locally.</small>
+                  </section>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="projects-section" class="project-hub">
+            <div class="project-hub-title">
+              <div><p class="eyebrow">YOUR WORKSPACE</p><h2>My projects</h2></div>
+              <button id="new-project-btn">＋ New project</button>
+            </div>
+            <div class="project-summary">
+              <button class="project-filter active" data-project-filter="all"><small>ALL VIDEOS</small><b id="project-count-all">0</b></button>
+              <button class="project-filter" data-project-filter="draft"><small>DRAFTS</small><b id="project-count-draft">0</b></button>
+              <button class="project-filter" data-project-filter="scheduled"><small>SCHEDULED</small><b id="project-count-scheduled">0</b></button>
+            </div>
+            <div class="project-toolbar">
+              <div>
+                <h3 id="project-view-title">Recent activity</h3>
+                <p id="project-view-copy">Generated videos, TikTok drafts, and scheduled posts live in one place.</p>
+              </div>
+              <span id="project-total-label">0 projects</span>
+            </div>
+            <div id="recent-grid" class="recent-grid project-grid">
+              <article class="empty-projects"><div>○</div><h3>No generated videos yet</h3><p>Your Starter and Seedance results will appear here</p></article>
+              <article class="new-project"><div>＋</div><h3>Start a new project</h3><p>Turn your next product into a story</p></article>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+    <div id="prompt-modal" class="modal-backdrop" hidden>
+      <section class="prompt-modal" role="dialog" aria-modal="true" aria-labelledby="prompt-modal-title">
+        <button id="close-prompt-modal" class="modal-close" aria-label="Close">×</button>
+        <p class="eyebrow">SEEDANCE 2.0 GENERATION</p>
+        <h2 id="prompt-modal-title">Review the video prompt.</h2>
+        <p class="modal-copy">This exact prompt and the Shopify product image will be sent to Seegen's Seedance-compatible API only after you confirm. A real generation may consume your Seegen balance.</p>
+        <div class="prompt-settings">
+          <span>9:16 vertical</span><span>5 seconds</span><span>720p</span><span>No audio</span>
+        </div>
+        <textarea id="seedance-prompt" readonly></textarea>
+        <div class="modal-actions">
+          <button id="cancel-generation" class="secondary-wide">Cancel</button>
+          <button id="confirm-generation" class="primary-wide">Confirm and generate <span>→</span></button>
+        </div>
+        <small id="seedance-config-note" class="config-note"></small>
+      </section>
+    </div>
+    <div id="auth-modal" class="modal-backdrop" hidden>
+      <section class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+        <button id="close-auth-modal" class="modal-close" aria-label="Close">×</button>
+        <p class="eyebrow">ACCOUNT ACCESS</p>
+        <h2 id="auth-modal-title">Log in to unlock your workspace.</h2>
+        <p class="modal-copy">Use Google or email to save projects, keep publishing drafts, and receive more creation credits.</p>
+        <button id="google-login" class="google-login"><span>G</span>Continue with Google</button>
+        <div class="auth-divider"><span></span><b>or</b><span></span></div>
+        <form id="email-login-form" class="email-login-form">
+          <label>
+            <span>Email</span>
+            <input id="login-email" type="email" placeholder="you@brand.com" required>
+          </label>
+          <label>
+            <span>Password</span>
+            <input id="login-password" type="password" placeholder="At least 6 characters" minlength="6" required>
+          </label>
+          <button class="primary-wide" type="submit">Continue with email</button>
+        </form>
+        <small class="config-note">MVP note: this creates a local session only. Production Google OAuth and email authentication can be connected next.</small>
+      </section>
+    </div>
+    <div id="toast" class="toast"></div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

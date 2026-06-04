@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: reelcraft-agent
+    env: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SEEGEN_BASE_URL
+        value: https://api.seegen.ai
+      - key: SEEGEN_MODEL
+        value: dreamina-seedance-2-0-260128
+      - key: SEEGEN_API_KEY
+        sync: false
