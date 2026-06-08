@@ -30,11 +30,20 @@ let selectedConcept = 0;
 let currentProduct = null;
 let promptInput = null;
 let pollingTimer = null;
-let generationEngine = "starter";
+let generationEngine = "seedance";
 let recentProjects = [];
+let pendingProjects = JSON.parse(window.localStorage.getItem("reelcraftPendingProjects") || "[]");
 let activeProject = null;
 let projectFilter = "all";
 let authUser = JSON.parse(window.localStorage.getItem("reelcraftUser") || "null");
+let activeView = "create";
+const viewMeta = {
+  create: { label: "New video", hash: "#create" },
+  projects: { label: "My projects", hash: "#projects" },
+  brand: { label: "Brand kit", hash: "#brand" },
+  inspiration: { label: "Inspiration", hash: "#inspiration" },
+  help: { label: "Help center", hash: "#help" }
+};
 
 function escapeHtml(value) {
   return String(value)
@@ -62,6 +71,9 @@ function renderConcepts() {
 function setStage(name, step) {
   document.querySelectorAll(".stage").forEach((node) => node.classList.remove("active"));
   document.querySelector(`#${name}-stage`).classList.add("active");
+  document.querySelector("#creator-panel").classList.toggle("generation-dock-active", name === "concept");
+  document.querySelector("#create-view").classList.toggle("generation-view-active", name === "concept");
+  document.querySelector("#create-view").classList.toggle("result-view-active", name === "result");
   document.querySelectorAll(".step").forEach((node, index) => {
     node.classList.toggle("active", index <= step);
     node.classList.toggle("current", index === step);
@@ -75,6 +87,32 @@ function toast(message) {
   element.textContent = message;
   element.classList.add("show");
   window.setTimeout(() => element.classList.remove("show"), 2400);
+}
+
+function switchView(view, { updateHash = true } = {}) {
+  activeView = viewMeta[view] ? view : "create";
+  if (activeView !== "create") {
+    document.querySelector("#create-view").classList.remove("generation-view-active", "result-view-active");
+    document.querySelector("#creator-panel").classList.remove("generation-dock-active");
+  }
+  document.querySelectorAll(".app-view").forEach((section) => {
+    const isActive = section.dataset.view === activeView;
+    section.hidden = !isActive;
+    section.classList.toggle("active", isActive);
+  });
+  document.querySelectorAll("[data-view-target]").forEach((link) => {
+    link.classList.toggle("active", link.dataset.viewTarget === activeView);
+  });
+  document.querySelector("#breadcrumb-page").textContent = viewMeta[activeView].label;
+  if (updateHash) window.history.replaceState(null, "", viewMeta[activeView].hash);
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function startNewProject() {
+  activeProject = null;
+  document.querySelector("#publish-panel").hidden = true;
+  switchView("create");
+  setStage("input", 0);
 }
 
 function getInitials(email = "") {
@@ -226,6 +264,61 @@ function showGenerationProgress(status = "queued") {
     "Keep this page open while ReelCraft waits for the generated clip.";
 }
 
+const generationProgress = {
+  queued: [8, "Queued for generation"],
+  running: [18, "Preparing your AI video"],
+  pending: [18, "Preparing your AI video"],
+  processing: [42, "Generating product scenes"],
+  downloading_assets: [22, "Downloading product assets"],
+  rendering_scenes: [58, "Rendering product scenes"],
+  assembling_video: [88, "Assembling the final video"],
+  succeeded: [100, "Video completed"],
+  failed: [100, "Generation failed"],
+  expired: [100, "Generation expired"]
+};
+
+function savePendingProjects() {
+  window.localStorage.setItem("reelcraftPendingProjects", JSON.stringify(pendingProjects));
+}
+
+function addPendingProject(taskId, engine) {
+  const existing = pendingProjects.find((project) => project.taskId === taskId);
+  if (existing) return existing;
+  const project = {
+    id: `pending_${taskId}`,
+    taskId,
+    title: currentProduct?.title || "Product video",
+    conceptTitle: concepts[selectedConcept]?.title || "Product spotlight",
+    engine: engine === "starter" ? "Starter Free" : "Seedance 2.0",
+    thumbnail: currentProduct?.image || currentProduct?.images?.[0] || "",
+    duration: engine === "starter" ? "00:15" : "00:05",
+    generationStatus: "queued",
+    progress: 8,
+    progressLabel: "Queued for generation",
+    createdAt: new Date().toISOString()
+  };
+  pendingProjects = [project, ...pendingProjects];
+  savePendingProjects();
+  renderProjects(recentProjects);
+  return project;
+}
+
+function updatePendingProject(taskId, status, error = "") {
+  const project = pendingProjects.find((item) => item.taskId === taskId);
+  if (!project) return;
+  const [progress, label] = generationProgress[status] || [35, "Generating your video"];
+  project.generationStatus = status;
+  project.progress = progress;
+  project.progressLabel = error || label;
+  savePendingProjects();
+  renderProjects(recentProjects);
+}
+
+function removePendingProject(taskId) {
+  pendingProjects = pendingProjects.filter((project) => project.taskId !== taskId);
+  savePendingProjects();
+}
+
 function showGeneratedVideo({ videoUrl, engine }) {
   const video = document.querySelector("#generated-video");
   video.src = videoUrl;
@@ -283,6 +376,7 @@ function renderPublishingPanel(project) {
 }
 
 function showProject(project) {
+  switchView("create");
   showGeneratedVideo({
     videoUrl: project.videoUrl,
     engine: project.engine === "Starter Free" ? "starter" : "seedance"
@@ -299,7 +393,7 @@ function renderProjects(projects) {
   recentProjects = projects;
   const grid = document.querySelector("#recent-grid");
   const counts = {
-    all: projects.length,
+    all: projects.length + pendingProjects.length,
     draft: projects.filter((project) => (project.publishing?.status || "draft") === "draft").length,
     scheduled: projects.filter((project) => project.publishing?.status === "scheduled").length
   };
@@ -320,21 +414,40 @@ function renderProjects(projects) {
   const visibleProjects = projectFilter === "all"
     ? projects
     : projects.filter((project) => (project.publishing?.status || "draft") === projectFilter);
+  const pendingCards = projectFilter === "all" ? pendingProjects.map((project) => {
+    const failed = ["failed", "expired"].includes(project.generationStatus);
+    return `
+      <article class="project-card generation-project ${failed ? "generation-failed" : ""}" data-pending-task-id="${escapeHtml(project.taskId)}">
+        <div class="generation-thumbnail">
+          ${project.thumbnail ? `<img src="${escapeHtml(project.thumbnail)}" alt="${escapeHtml(project.title)}">` : ""}
+          <div class="generation-thumbnail-overlay"><span>${failed ? "!" : "✦"}</span></div>
+        </div>
+        <span class="duration">${escapeHtml(project.duration)}</span>
+        <span class="publish-badge generation-status">${failed ? "failed" : "generating"}</span>
+        <div class="project-card-body">
+          <h3>${escapeHtml(project.title)}</h3>
+          <p>${escapeHtml(project.engine)} · ${escapeHtml(project.conceptTitle)}</p>
+          <div class="project-progress"><i style="width:${project.progress}%"></i></div>
+          <small>${escapeHtml(project.progressLabel)} · ${project.progress}%</small>
+        </div>
+      </article>
+    `;
+  }).join("") : "";
   const projectCards = visibleProjects.map((project) => `
     <article class="project-card" data-project-id="${escapeHtml(project.id)}">
       <img src="${escapeHtml(project.thumbnail)}" alt="${escapeHtml(project.title)}">
       <span class="duration">${escapeHtml(project.duration)}</span>
-      <span class="publish-badge">${escapeHtml(project.publishing?.status || "draft")}</span>
+      <span class="publish-badge completed-badge">completed</span>
       <div class="project-card-body">
         <h3>${escapeHtml(project.title)}</h3>
         <p>${escapeHtml(project.engine)} · ${escapeHtml(project.conceptTitle)}</p>
-        <small>${escapeHtml(project.publishing?.scheduledAt ? new Date(project.publishing.scheduledAt).toLocaleString() : "No publish time set")}</small>
+        <small>${escapeHtml(project.publishing?.status || "draft")} · ${escapeHtml(project.publishing?.scheduledAt ? new Date(project.publishing.scheduledAt).toLocaleString() : "No publish time set")}</small>
       </div>
     </article>
   `).join("");
-  grid.innerHTML = `${projectCards || `
+  grid.innerHTML = `${pendingCards}${projectCards || (!pendingCards ? `
     <article class="empty-projects"><div>○</div><h3>No projects in this view</h3><p>Generate a video or switch filters to see more work.</p></article>
-  `}
+  ` : "")}
     <article class="new-project"><div>＋</div><h3>Start a new project</h3><p>Turn your next product into a story</p></article>`;
 }
 
@@ -342,6 +455,13 @@ async function refreshProjects() {
   const response = await fetch("/api/projects");
   const body = await response.json();
   renderProjects(body.projects || []);
+}
+
+function resumePendingGeneration() {
+  const project = pendingProjects.find((item) => !["failed", "expired"].includes(item.generationStatus));
+  if (!project) return;
+  if (project.engine === "Starter Free") pollStarterTask(project.taskId);
+  else pollSeedanceTask(project.taskId);
 }
 
 async function savePublishing(statusOverride) {
@@ -380,20 +500,22 @@ async function pollStarterTask(taskId) {
     const body = await response.json();
     if (!response.ok) throw new Error(body.error || "Unable to retrieve the Starter task.");
     const { task } = body;
+    updatePendingProject(taskId, task.status);
     button.disabled = true;
     button.innerHTML = `Starter video: ${escapeHtml(task.status.replaceAll("_", " "))}...`;
     if (task.status === "succeeded" && task.videoUrl) {
       button.disabled = false;
       button.innerHTML = "Generate free video <span>FREE</span>";
-      if (task.project) showProject(task.project);
-      else showGeneratedVideo({ videoUrl: task.videoUrl, engine: "starter" });
+      removePendingProject(taskId);
       await refreshProjects();
+      switchView("projects");
       toast("Your free Starter MP4 is ready.");
       return;
     }
     if (task.status === "failed") throw new Error(task.error || "Starter video generation failed.");
     pollingTimer = window.setTimeout(() => pollStarterTask(taskId), 1200);
   } catch (error) {
+    updatePendingProject(taskId, "failed", error.message);
     button.disabled = false;
     button.innerHTML = "Try Starter again <span>FREE</span>";
     toast(error.message);
@@ -411,6 +533,9 @@ async function startStarterGeneration() {
   });
   const body = await response.json();
   if (!response.ok) throw new Error(body.error || "Unable to start Starter generation.");
+  addPendingProject(body.task.id, "starter");
+  switchView("projects");
+  toast("Video generation started. You can track progress here.");
   pollStarterTask(body.task.id);
 }
 
@@ -421,12 +546,13 @@ async function pollSeedanceTask(taskId) {
     const body = await response.json();
     if (!response.ok) throw new Error(body.error || "Unable to retrieve the Seedance task.");
     const { task } = body;
+    updatePendingProject(taskId, task.status);
     showGenerationProgress(task.status);
     if (task.status === "succeeded" && task.videoUrl) {
       setModalOpen(false);
-      if (task.project) showProject(task.project);
-      else showGeneratedVideo({ videoUrl: task.videoUrl, engine: "seedance" });
+      removePendingProject(taskId);
       await refreshProjects();
+      switchView("projects");
       toast("Your real Seedance 2.0 clip is ready.");
       return;
     }
@@ -435,6 +561,7 @@ async function pollSeedanceTask(taskId) {
     }
     pollingTimer = window.setTimeout(() => pollSeedanceTask(taskId), 3500);
   } catch (error) {
+    updatePendingProject(taskId, "failed", error.message);
     document.querySelector("#confirm-generation").disabled = false;
     document.querySelector("#confirm-generation").innerHTML = "Try again <span>→</span>";
     document.querySelector("#seedance-config-note").textContent = error.message;
@@ -498,6 +625,10 @@ document.querySelectorAll(".engine-card").forEach((button) => {
   button.addEventListener("click", () => {
     generationEngine = button.dataset.engine;
     document.querySelectorAll(".engine-card").forEach((node) => node.classList.toggle("selected", node === button));
+    document.querySelector(".generation-dock-label b").textContent = generationEngine === "starter"
+      ? "Starter Free"
+      : "Seedance 2.0 Premium";
+    document.querySelector(".generation-dock-label > span").textContent = generationEngine === "starter" ? "✓" : "✦";
     document.querySelector("#generate-btn").innerHTML = generationEngine === "starter"
       ? "Generate free video <span>FREE</span>"
       : "Generate with Seedance <span>✦ 4</span>";
@@ -544,6 +675,10 @@ document.querySelector("#confirm-generation").addEventListener("click", async ()
     const body = await response.json();
     if (!response.ok) throw new Error(body.error || "Unable to start Seedance generation.");
     creditCount.textContent = Math.max(0, Number(creditCount.textContent) - 4);
+    addPendingProject(body.task.id, "seedance");
+    setModalOpen(false);
+    switchView("projects");
+    toast("Seedance generation started. You can track progress here.");
     pollSeedanceTask(body.task.id);
   } catch (error) {
     document.querySelector("#confirm-generation").disabled = false;
@@ -555,6 +690,7 @@ document.querySelector("#confirm-generation").addEventListener("click", async ()
 document.querySelector("#close-prompt-modal").addEventListener("click", () => setModalOpen(false));
 document.querySelector("#cancel-generation").addEventListener("click", () => setModalOpen(false));
 document.querySelector("#another-btn").addEventListener("click", () => setStage("concept", 1));
+document.querySelector("#result-back-projects").addEventListener("click", () => switchView("projects"));
 document.querySelector("#save-publish-draft").addEventListener("click", () => savePublishing("draft"));
 document.querySelector("#schedule-publish").addEventListener("click", () => savePublishing("scheduled"));
 document.querySelector("#open-auth-modal").addEventListener("click", () => setAuthModalOpen(true));
@@ -567,11 +703,14 @@ document.querySelector("#email-login-form").addEventListener("submit", (event) =
   completeLogin({ email: document.querySelector("#login-email").value, provider: "email" });
 });
 document.querySelector(".credits").addEventListener("click", () => toast("Starter videos are free. Seedance Premium uses 4 credits per clip."));
-document.querySelectorAll("[data-nav-target]").forEach((link) => {
+document.querySelectorAll("[data-view-target]").forEach((link) => {
   link.addEventListener("click", (event) => {
     event.preventDefault();
-    document.querySelectorAll(".primary-nav .nav-item").forEach((node) => node.classList.toggle("active", node === link));
-    document.querySelector(`#${link.dataset.navTarget}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (link.dataset.viewTarget === "create") {
+      startNewProject();
+      return;
+    }
+    switchView(link.dataset.viewTarget);
   });
 });
 document.querySelectorAll(".project-filter").forEach((button) => {
@@ -580,7 +719,64 @@ document.querySelectorAll(".project-filter").forEach((button) => {
     renderProjects(recentProjects);
   });
 });
-document.querySelector("#new-project-btn").addEventListener("click", () => setStage("input", 0));
+document.querySelector("#new-project-btn").addEventListener("click", startNewProject);
+document.querySelector("#projects-create-btn").addEventListener("click", startNewProject);
+document.querySelectorAll(".fake-action").forEach((button) => {
+  button.addEventListener("click", () => toast(button.dataset.toast));
+});
+document.querySelectorAll(".use-idea").forEach((button) => {
+  button.addEventListener("click", () => {
+    switchView("create");
+    setStage("input", 0);
+    toast(`“${button.dataset.concept}” added as your creative direction.`);
+  });
+});
+
+const filterIdeas = () => {
+  const query = document.querySelector("#idea-search").value.trim().toLowerCase();
+  const activeFilter = document.querySelector("[data-idea-filter].active")?.dataset.ideaFilter || "all";
+  let visible = 0;
+  document.querySelectorAll("[data-idea-card]").forEach((card) => {
+    const matchesFilter = activeFilter === "all" || card.dataset.category.includes(activeFilter);
+    const matchesQuery = !query || `${card.textContent} ${card.dataset.keywords}`.toLowerCase().includes(query);
+    card.hidden = !(matchesFilter && matchesQuery);
+    if (!card.hidden) visible += 1;
+  });
+  document.querySelector("#idea-count").textContent = `${visible} idea${visible === 1 ? "" : "s"}`;
+  document.querySelector("#idea-empty").hidden = visible !== 0;
+};
+
+document.querySelector("#idea-search").addEventListener("input", filterIdeas);
+document.querySelectorAll("[data-idea-filter]").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll("[data-idea-filter]").forEach((item) => item.classList.toggle("active", item === button));
+    filterIdeas();
+  });
+});
+
+const filterHelpArticles = (value) => {
+  const query = value.trim().toLowerCase();
+  const input = document.querySelector("#help-search");
+  input.value = value;
+  let visible = 0;
+  document.querySelectorAll("[data-help-article]").forEach((article) => {
+    article.hidden = Boolean(query) && !`${article.textContent} ${article.dataset.keywords}`.toLowerCase().includes(query);
+    if (!article.hidden) visible += 1;
+  });
+  document.querySelector("#help-result-count").textContent = `${visible} article${visible === 1 ? "" : "s"}`;
+  document.querySelector("#help-empty").hidden = visible !== 0;
+};
+
+document.querySelector("#help-search").addEventListener("input", (event) => filterHelpArticles(event.target.value));
+document.querySelectorAll("[data-help-query]").forEach((button) => {
+  button.addEventListener("click", () => filterHelpArticles(button.dataset.helpQuery));
+});
+document.querySelectorAll("[data-help-article]").forEach((article) => {
+  article.addEventListener("click", () => toast("Article preview opened. Full documentation content can be connected next."));
+});
+document.querySelector("#contact-support").addEventListener("click", () => {
+  toast("Support request drafted. Email and ticket delivery can be connected next.");
+});
 document.querySelector("#recent-grid").addEventListener("click", (event) => {
   const card = event.target.closest(".project-card");
   if (card) {
@@ -588,9 +784,11 @@ document.querySelector("#recent-grid").addEventListener("click", (event) => {
     if (project) showProject(project);
     return;
   }
-  if (event.target.closest(".new-project")) setStage("input", 0);
+  if (event.target.closest(".new-project")) startNewProject();
 });
 
 renderConcepts();
 renderAuthState();
-refreshProjects();
+refreshProjects().then(resumePendingGeneration);
+const initialView = Object.keys(viewMeta).find((view) => viewMeta[view].hash === window.location.hash) || "create";
+switchView(initialView, { updateHash: false });

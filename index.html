@@ -18,10 +18,10 @@
         </a>
 
         <nav class="primary-nav">
-          <a class="nav-item active" href="#creator-panel" data-nav-target="creator-panel"><span class="nav-icon">✦</span>Create video</a>
-          <a class="nav-item" href="#projects-section" data-nav-target="projects-section"><span class="nav-icon">▣</span>My projects</a>
-          <a class="nav-item" href="#"><span class="nav-icon">▱</span>Brand kit</a>
-          <a class="nav-item" href="#"><span class="nav-icon">⌁</span>Inspiration</a>
+          <a class="nav-item active" href="#create" data-view-target="create"><span class="nav-icon">✦</span>Create video</a>
+          <a class="nav-item" href="#projects" data-view-target="projects"><span class="nav-icon">▣</span>My projects</a>
+          <a class="nav-item" href="#brand" data-view-target="brand"><span class="nav-icon">▱</span>Brand kit</a>
+          <a class="nav-item" href="#inspiration" data-view-target="inspiration"><span class="nav-icon">⌁</span>Inspiration</a>
         </nav>
 
         <div class="sidebar-bottom">
@@ -33,14 +33,20 @@
             </span>
             <em>→</em>
           </button>
-          <a class="nav-item" href="#"><span class="nav-icon">?</span>Help center</a>
-          <a class="nav-item" href="#"><span class="nav-icon">⚙</span>Settings</a>
+          <a class="nav-item" href="#help" data-view-target="help"><span class="nav-icon">?</span>Help center</a>
         </div>
       </aside>
 
       <main>
         <header class="topbar">
-          <div class="breadcrumb"><span>Studio</span><b>/</b><strong>New video</strong></div>
+          <div class="breadcrumb"><span>Studio</span><b>/</b><strong id="breadcrumb-page">New video</strong></div>
+          <nav class="mobile-view-nav" aria-label="Workspace views">
+            <button class="active" data-view-target="create">Create</button>
+            <button data-view-target="projects">Projects</button>
+            <button data-view-target="brand">Brand</button>
+            <button data-view-target="inspiration">Ideas</button>
+            <button data-view-target="help">Help</button>
+          </nav>
           <div class="account-actions">
             <button class="credits"><span>✦</span><b id="credit-count">12</b> credits</button>
             <button id="open-auth-modal" class="login-btn">Log in</button>
@@ -48,7 +54,7 @@
           </div>
         </header>
 
-        <section class="workspace">
+        <section id="create-view" class="workspace app-view active" data-view="create">
           <div class="hero">
             <div>
               <p class="eyebrow">AI PRODUCT VIDEO STUDIO</p>
@@ -174,111 +180,154 @@
                   <p>Each concept is grounded in the product analysis above. Pick a direction for your first cut.</p>
                   <div id="concept-list" class="concept-list"></div>
                   <div class="engine-picker">
-                    <button class="engine-card selected" data-engine="starter">
+                    <button class="engine-card" data-engine="starter">
                       <span class="engine-icon">✓</span>
                       <span><b>Starter · Free</b><small>15s animated product video · Local MP4 export</small></span>
                       <em>FREE</em>
                     </button>
-                    <button class="engine-card" data-engine="seedance">
+                    <button class="engine-card selected" data-engine="seedance">
                       <span class="engine-icon">✦</span>
                       <span><b>Seedance 2.0 · Premium</b><small>5s AI clip · Powered through Seegen</small></span>
                       <em>PREMIUM</em>
                     </button>
                   </div>
                   <div class="generation-options">
+                    <div class="generation-dock-label"><span>✦</span><p><small>READY TO GENERATE</small><b>Seedance 2.0 Premium</b></p></div>
                     <button><small>FORMAT</small><b>9:16 Vertical⌄</b></button>
-                    <button><small>DURATION</small><b id="duration-value">15 seconds⌄</b></button>
+                    <button><small>DURATION</small><b id="duration-value">5 seconds⌄</b></button>
                     <button><small>LANGUAGE</small><b>English (US)⌄</b></button>
-                    <button id="generate-btn" class="generate-btn">Generate free video <span>FREE</span></button>
+                    <button id="generate-btn" class="generate-btn">Generate with Seedance <span>✦ 4</span></button>
                   </div>
               </div>
             </div>
 
             <div id="result-stage" class="stage">
-              <div class="result-layout">
-                <div class="video-preview">
-                  <div class="video-frame">
-                    <img id="video-placeholder" src="https://images.unsplash.com/photo-1602523961358-f9f03dd557db?auto=format&fit=crop&w=720&q=85" alt="Video preview placeholder">
-                    <video id="generated-video" controls playsinline hidden></video>
-                    <div class="video-gradient"></div>
-                    <span class="scene-pill">SCENE 01 · HOOK</span>
-                    <div class="video-caption">POV: your home suddenly<br>feels like a <em>boutique hotel</em></div>
-                    <button class="preview-play">▶</button>
-                    <div class="timeline"><i></i></div>
+              <div class="result-workspace">
+                <header class="result-header">
+                  <div class="result-heading">
+                    <div id="result-pill" class="success-pill"><span>✓</span> VIDEO GENERATED</div>
+                    <h2 id="result-title">Your product video is ready.</h2>
+                    <p id="result-description">Generated locally from your Shopify listing with animated product scenes, selling-point captions, and a closing CTA.</p>
                   </div>
-                </div>
-                <div class="result-details">
-                  <div id="result-pill" class="success-pill">✓ VIDEO GENERATED</div>
-                  <h2 id="result-title">Your product video is ready.</h2>
-                  <p id="result-description">Generated locally from your Shopify listing with animated product scenes, selling-point captions, and a closing CTA.</p>
-                  <div class="result-meta">
-                    <div><small>FORMAT</small><b>9:16 Vertical</b></div>
-                    <div><small>LENGTH</small><b id="result-length">00:15</b></div>
-                    <div><small>TYPE</small><b id="result-type">Starter Free MP4</b></div>
-                  </div>
-                  <a id="result-download" class="primary-wide result-action" href="#" download>Download MP4 <span>↓</span></a>
-                  <button id="another-btn" class="secondary-wide">＋ Create another version</button>
-                  <small id="generation-note" class="seedance-note">✓ Generated locally with Starter Free</small>
-                  <section id="publish-panel" class="publish-panel" hidden>
-                    <div class="publish-heading">
-                      <div>
-                        <small>TIKTOK PUBLISHING PACKAGE</small>
-                        <h3>Publish plan</h3>
+                  <button id="result-back-projects" class="result-back">View all projects <span>→</span></button>
+                </header>
+
+                <div class="result-layout">
+                  <section class="video-preview">
+                    <div class="preview-ambient preview-ambient-one"></div>
+                    <div class="preview-ambient preview-ambient-two"></div>
+                    <div class="preview-toolbar">
+                      <span><i></i> Final render</span>
+                      <b>9:16 · HD</b>
+                    </div>
+                    <div class="video-frame">
+                      <img id="video-placeholder" src="https://images.unsplash.com/photo-1602523961358-f9f03dd557db?auto=format&fit=crop&w=720&q=85" alt="Video preview placeholder">
+                      <video id="generated-video" controls playsinline hidden></video>
+                      <div class="video-gradient"></div>
+                      <span class="scene-pill">SCENE 01 · HOOK</span>
+                      <div class="video-caption">POV: your home suddenly<br>feels like a <em>boutique hotel</em></div>
+                      <button class="preview-play">▶</button>
+                      <div class="timeline"><i></i></div>
+                    </div>
+                    <div class="preview-footer">
+                      <span>ReelCraft render</span>
+                      <span>Ready to publish</span>
+                    </div>
+                  </section>
+
+                  <section class="result-details">
+                    <div class="result-section-label">VIDEO DETAILS</div>
+                    <div class="result-meta">
+                      <div><span class="meta-icon">▯</span><small>FORMAT</small><b>9:16 Vertical</b></div>
+                      <div><span class="meta-icon">◷</span><small>LENGTH</small><b id="result-length">00:15</b></div>
+                      <div><span class="meta-icon">✦</span><small>ENGINE</small><b id="result-type">Starter Free MP4</b></div>
+                    </div>
+
+                    <div class="result-primary-actions">
+                      <a id="result-download" class="result-download" href="#" download><span class="action-icon">↓</span><span><small>EXPORT VIDEO</small><b>Download MP4</b></span><em>→</em></a>
+                      <button id="another-btn" class="result-version"><span class="action-icon">↻</span><span><small>TRY ANOTHER ANGLE</small><b>Create new version</b></span><em>＋</em></button>
+                    </div>
+
+                    <div class="result-ready-card">
+                      <div class="ready-icon">✓</div>
+                      <div><b>Your asset is saved</b><p id="generation-note">Generated locally with Starter Free</p></div>
+                      <span>MP4</span>
+                    </div>
+
+                    <section id="publish-panel" class="publish-panel" hidden>
+                      <div class="publish-heading">
+                        <div>
+                          <small>NEXT STEP · TIKTOK</small>
+                          <h3>Prepare your post</h3>
+                          <p>Polish the copy, choose your audience, and save a publishing schedule.</p>
+                        </div>
+                        <span id="publish-status">Draft</span>
                       </div>
-                      <span id="publish-status">Draft</span>
-                    </div>
 
-                    <div class="publish-steps">
-                      <section class="publish-step">
-                        <div class="publish-step-title"><b>1</b><span>Post copy</span></div>
-                        <label class="publish-field">
-                          <span>Caption</span>
-                          <textarea id="publish-caption"></textarea>
-                        </label>
-                        <label class="publish-field">
-                          <span>Hashtags</span>
-                          <input id="publish-hashtags" type="text">
-                        </label>
-                      </section>
-
-                      <section class="publish-step">
-                        <div class="publish-step-title"><b>2</b><span>Audience and schedule</span></div>
-                        <div class="publish-row">
+                      <div class="publish-steps">
+                        <section class="publish-step publish-copy-step">
+                          <div class="publish-step-title"><b>1</b><span>Post copy</span><em>AI prepared</em></div>
                           <label class="publish-field">
-                            <span>Privacy</span>
-                            <select id="publish-privacy">
-                              <option value="public">Public</option>
-                              <option value="friends">Friends</option>
-                              <option value="private">Private</option>
-                            </select>
+                            <span>Caption</span>
+                            <textarea id="publish-caption"></textarea>
                           </label>
                           <label class="publish-field">
-                            <span>Schedule time</span>
-                            <input id="publish-scheduled-at" type="datetime-local">
+                            <span>Hashtags</span>
+                            <input id="publish-hashtags" type="text">
                           </label>
-                        </div>
-                        <div class="publish-toggles">
-                          <label><input id="publish-comments" type="checkbox"> Comments</label>
-                          <label><input id="publish-duet" type="checkbox"> Duet</label>
-                          <label><input id="publish-stitch" type="checkbox"> Stitch</label>
-                        </div>
-                      </section>
+                        </section>
 
-                      <section class="publish-step">
-                        <div class="publish-step-title"><b>3</b><span>Final checks</span></div>
-                        <ul id="publish-checklist" class="publish-checklist"></ul>
-                        <div class="publish-actions">
-                          <button id="save-publish-draft" class="secondary-wide">Save draft</button>
-                          <button id="schedule-publish" class="primary-wide">Schedule post</button>
-                        </div>
-                      </section>
-                    </div>
-                    <small class="publish-note">TikTok direct posting requires OAuth and Content Posting API approval. This MVP saves the publish package and schedule locally.</small>
+                        <section class="publish-step">
+                          <div class="publish-step-title"><b>2</b><span>Audience and schedule</span></div>
+                          <div class="publish-row">
+                            <label class="publish-field">
+                              <span>Privacy</span>
+                              <select id="publish-privacy">
+                                <option value="public">Public</option>
+                                <option value="friends">Friends</option>
+                                <option value="private">Private</option>
+                              </select>
+                            </label>
+                            <label class="publish-field">
+                              <span>Schedule time</span>
+                              <input id="publish-scheduled-at" type="datetime-local">
+                            </label>
+                          </div>
+                          <div class="publish-toggles">
+                            <label><input id="publish-comments" type="checkbox"> Comments</label>
+                            <label><input id="publish-duet" type="checkbox"> Duet</label>
+                            <label><input id="publish-stitch" type="checkbox"> Stitch</label>
+                          </div>
+                        </section>
+
+                        <section class="publish-step publish-final-step">
+                          <div class="publish-step-title"><b>3</b><span>Final checks</span></div>
+                          <ul id="publish-checklist" class="publish-checklist"></ul>
+                          <div class="publish-actions">
+                            <button id="save-publish-draft" class="secondary-wide">Save draft</button>
+                            <button id="schedule-publish" class="primary-wide">Schedule post <span>→</span></button>
+                          </div>
+                        </section>
+                      </div>
+                      <small class="publish-note">TikTok direct posting requires OAuth and Content Posting API approval. This MVP saves the complete publishing package and schedule locally.</small>
+                    </section>
                   </section>
                 </div>
               </div>
             </div>
           </section>
+
+        </section>
+
+        <section id="projects-view" class="workspace app-view projects-workspace" data-view="projects" hidden>
+          <div class="projects-hero">
+            <div>
+              <p class="eyebrow">CONTENT OPERATIONS</p>
+              <h1>Manage every video<br><span>from one workspace.</span></h1>
+              <p class="hero-copy">Review generated assets, finish TikTok publishing packages, and track scheduled content without leaving your project library.</p>
+            </div>
+            <button id="projects-create-btn" class="projects-create-btn">＋ Create new video</button>
+          </div>
 
           <section id="projects-section" class="project-hub">
             <div class="project-hub-title">
@@ -302,6 +351,185 @@
               <article class="new-project"><div>＋</div><h3>Start a new project</h3><p>Turn your next product into a story</p></article>
             </div>
           </section>
+        </section>
+
+        <section id="brand-view" class="workspace app-view feature-workspace" data-view="brand" hidden>
+          <div class="feature-hero brand-hero">
+            <div>
+              <p class="eyebrow">BRAND SYSTEM</p>
+              <h1>Keep every video<br><span>unmistakably yours.</span></h1>
+              <p class="hero-copy">Give ReelCraft a clear visual and verbal system so generated hooks, captions, and calls to action stay consistent across every channel.</p>
+            </div>
+            <div class="hero-actions">
+              <button class="secondary-action fake-action" data-toast="Brand preview opened.">Preview brand</button>
+              <button class="primary-action fake-action" data-toast="Brand kit saved for future generations.">Save changes</button>
+            </div>
+          </div>
+
+          <div class="brand-layout">
+            <section class="surface-card brand-profile">
+              <div class="card-heading">
+                <div><p class="eyebrow">ACTIVE BRAND</p><h2>Northstar Goods</h2></div>
+                <span class="status-badge">Ready</span>
+              </div>
+              <div class="brand-lockup">
+                <div class="brand-symbol"><i></i><i></i></div>
+                <div><b>NORTHSTAR</b><span>GOODS FOR BETTER DAYS</span></div>
+              </div>
+              <div class="brand-domain"><span>Primary domain</span><b>northstargoods.co</b></div>
+              <button class="outline-button fake-action" data-toast="Logo uploader is ready for backend storage.">＋ Upload logo variation</button>
+            </section>
+
+            <section class="surface-card brand-colors">
+              <div class="card-heading"><div><p class="eyebrow">VISUAL IDENTITY</p><h2>Color palette</h2></div><button class="icon-button fake-action" data-toast="A new color slot was added.">＋</button></div>
+              <div class="color-palette">
+                <button style="--swatch:#173126"><span>Forest</span><b>#173126</b></button>
+                <button style="--swatch:#CDEB79"><span>Sprout</span><b>#CDEB79</b></button>
+                <button style="--swatch:#F2A65A"><span>Sunset</span><b>#F2A65A</b></button>
+                <button style="--swatch:#F7F5ED"><span>Canvas</span><b>#F7F5ED</b></button>
+                <button style="--swatch:#202720"><span>Ink</span><b>#202720</b></button>
+              </div>
+            </section>
+
+            <section class="surface-card typography-card">
+              <div class="card-heading"><div><p class="eyebrow">TYPOGRAPHY</p><h2>Type system</h2></div><span class="subtle-badge">2 families</span></div>
+              <div class="type-sample display-type"><span>Headlines · Manrope ExtraBold</span><b>Make products feel essential.</b></div>
+              <div class="type-sample body-type"><span>Body · DM Sans Regular</span><p>Clear, warm copy that gets to the benefit quickly and keeps the product at the center.</p></div>
+            </section>
+
+            <section class="surface-card voice-card">
+              <div class="card-heading"><div><p class="eyebrow">BRAND VOICE</p><h2>How Northstar speaks</h2></div><button class="text-button fake-action" data-toast="Brand voice editor opened.">Edit</button></div>
+              <div class="voice-traits">
+                <div><b>Warm</b><p>Human and encouraging, never overly polished.</p></div>
+                <div><b>Clear</b><p>Short sentences, concrete claims, useful detail.</p></div>
+                <div><b>Product-led</b><p>Show the proof before making the promise.</p></div>
+              </div>
+              <div class="avoid-row"><span>Avoid</span><b>Hype language</b><b>Fake urgency</b><b>Unverified claims</b></div>
+            </section>
+
+            <section class="surface-card defaults-card">
+              <div class="card-heading"><div><p class="eyebrow">GENERATION DEFAULTS</p><h2>Content rules</h2></div><span class="status-badge">Applied</span></div>
+              <div class="default-grid">
+                <div><small>PRIMARY CTA</small><b>Shop the collection</b></div>
+                <div><small>LANGUAGE</small><b>English (US)</b></div>
+                <div><small>VIDEO FORMAT</small><b>9:16 Vertical</b></div>
+                <div><small>CAPTION STYLE</small><b>Sentence case</b></div>
+              </div>
+              <label class="brand-switch"><input type="checkbox" checked><span></span><b>Automatically apply Brand Kit to new generations</b></label>
+            </section>
+          </div>
+        </section>
+
+        <section id="inspiration-view" class="workspace app-view feature-workspace" data-view="inspiration" hidden>
+          <div class="feature-hero inspiration-hero">
+            <div>
+              <p class="eyebrow">CREATIVE INTELLIGENCE</p>
+              <h1>Start with an idea<br><span>already built to move.</span></h1>
+              <p class="hero-copy">Explore proven short-form structures, save the ones that fit your catalog, then turn any concept into a product video.</p>
+            </div>
+            <div class="trend-pulse"><span>↗</span><div><small>WEEKLY TREND PULSE</small><b>UGC demos +28%</b><p>Across beauty and lifestyle</p></div></div>
+          </div>
+
+          <section class="inspiration-toolbar surface-card">
+            <label class="idea-search"><span>⌕</span><input id="idea-search" type="search" placeholder="Search hooks, formats, or industries..."></label>
+            <div class="idea-filters">
+              <button class="active" data-idea-filter="all">For you</button>
+              <button data-idea-filter="ugc">UGC</button>
+              <button data-idea-filter="demo">Product demo</button>
+              <button data-idea-filter="problem">Problem / Solution</button>
+              <button data-idea-filter="seasonal">Seasonal</button>
+            </div>
+          </section>
+
+          <div class="section-heading">
+            <div><p class="eyebrow">TRENDING THIS WEEK</p><h2>Concepts worth testing</h2></div>
+            <span id="idea-count">6 ideas</span>
+          </div>
+          <div id="inspiration-grid" class="inspiration-grid">
+            <article class="idea-card" data-idea-card data-category="ugc beauty" data-keywords="testimonial review skincare routine">
+              <div class="idea-visual idea-peach"><span class="visual-label">UGC · 18 SEC</span><div class="phone-copy">“I didn’t expect<br>this to work so fast.”</div><i>▶</i></div>
+              <div class="idea-body"><div><span class="idea-tag">UGC TESTIMONIAL</span><span class="metric">8.4% hold rate</span></div><h3>The honest first reaction</h3><p>Open with a candid result, then reveal the product and the one detail that changed the experience.</p><button class="use-idea" data-concept="The honest first reaction">Use this concept <span>→</span></button></div>
+            </article>
+            <article class="idea-card" data-idea-card data-category="demo home" data-keywords="product demo satisfying feature closeup">
+              <div class="idea-visual idea-green"><span class="visual-label">DEMO · 12 SEC</span><div class="demo-orbit"><b>01</b><b>02</b><b>03</b></div><i>▶</i></div>
+              <div class="idea-body"><div><span class="idea-tag">PRODUCT DEMO</span><span class="metric">3.1x saves</span></div><h3>Three details in twelve seconds</h3><p>Use crisp close-ups and numbered captions to turn small product features into proof.</p><button class="use-idea" data-concept="Three details in twelve seconds">Use this concept <span>→</span></button></div>
+            </article>
+            <article class="idea-card" data-idea-card data-category="problem wellness" data-keywords="problem solution before after wellness">
+              <div class="idea-visual idea-blue"><span class="visual-label">P/S · 15 SEC</span><div class="split-copy"><b>BEFORE</b><b>AFTER</b></div><i>▶</i></div>
+              <div class="idea-body"><div><span class="idea-tag">PROBLEM / SOLUTION</span><span class="metric">+41% clicks</span></div><h3>From friction to fixed</h3><p>Name one relatable frustration, demonstrate the fix, and close on the new everyday outcome.</p><button class="use-idea" data-concept="From friction to fixed">Use this concept <span>→</span></button></div>
+            </article>
+            <article class="idea-card" data-idea-card data-category="seasonal gifting" data-keywords="gift guide seasonal holiday collection">
+              <div class="idea-visual idea-red"><span class="visual-label">SEASONAL · 20 SEC</span><div class="gift-copy">THE “I KNOW<br>YOU” GIFT GUIDE</div><i>▶</i></div>
+              <div class="idea-body"><div><span class="idea-tag">SEASONAL</span><span class="metric">2.7x shares</span></div><h3>The personality gift guide</h3><p>Match product variants to three recognizable personalities for a highly shareable list format.</p><button class="use-idea" data-concept="The personality gift guide">Use this concept <span>→</span></button></div>
+            </article>
+            <article class="idea-card" data-idea-card data-category="ugc fashion" data-keywords="pov lifestyle outfit fashion">
+              <div class="idea-visual idea-violet"><span class="visual-label">POV · 10 SEC</span><div class="pov-copy">POV: it finally<br>fits your routine.</div><i>▶</i></div>
+              <div class="idea-body"><div><span class="idea-tag">LIFESTYLE POV</span><span class="metric">71% completion</span></div><h3>The everyday upgrade</h3><p>Place the product inside a familiar routine and make the improved moment feel instantly attainable.</p><button class="use-idea" data-concept="The everyday upgrade">Use this concept <span>→</span></button></div>
+            </article>
+            <article class="idea-card" data-idea-card data-category="demo tech" data-keywords="comparison myth test product demo">
+              <div class="idea-visual idea-yellow"><span class="visual-label">TEST · 16 SEC</span><div class="test-copy"><small>CLAIM</small><b>vs.</b><small>PROOF</small></div><i>▶</i></div>
+              <div class="idea-body"><div><span class="idea-tag">PROOF TEST</span><span class="metric">5.9% CTR</span></div><h3>Put the claim on trial</h3><p>State the product claim, run one visual test, and let the result deliver the selling point.</p><button class="use-idea" data-concept="Put the claim on trial">Use this concept <span>→</span></button></div>
+            </article>
+          </div>
+          <div id="idea-empty" class="empty-state" hidden>No ideas match this search yet.</div>
+        </section>
+
+        <section id="help-view" class="workspace app-view help-workspace" data-view="help" hidden>
+          <section class="help-hero">
+            <p class="eyebrow">REELCRAFT SUPPORT</p>
+            <h1>How can we help?</h1>
+            <p>Find practical answers for product analysis, video generation, publishing, and account setup.</p>
+            <label class="help-search"><span>⌕</span><input id="help-search" type="search" placeholder="Search the Help Center..."><kbd>⌘ K</kbd></label>
+            <div class="quick-links"><span>Popular:</span><button data-help-query="Shopify">Shopify links</button><button data-help-query="Seedance">Seedance</button><button data-help-query="TikTok">TikTok publishing</button></div>
+          </section>
+
+          <div class="help-layout">
+            <div class="help-content">
+              <div class="section-heading"><div><p class="eyebrow">BROWSE BY TOPIC</p><h2>Choose a category</h2></div></div>
+              <div class="help-categories">
+                <button data-help-query="getting started account"><span>↗</span><b>Getting started</b><small>Set up your first workspace</small></button>
+                <button data-help-query="Shopify product analysis"><span>◫</span><b>Product analysis</b><small>Listings, images, and insights</small></button>
+                <button data-help-query="Seedance video generation"><span>✦</span><b>Video generation</b><small>Starter and Seedance workflows</small></button>
+                <button data-help-query="TikTok publishing"><span>▶</span><b>TikTok publishing</b><small>Captions, drafts, and schedules</small></button>
+                <button data-help-query="account billing credits"><span>◎</span><b>Account & billing</b><small>Login, credits, and plans</small></button>
+                <button data-help-query="API error troubleshooting"><span>⌁</span><b>API troubleshooting</b><small>Keys, status codes, and retries</small></button>
+              </div>
+
+              <div class="section-heading article-heading"><div><p class="eyebrow">MOST READ</p><h2>Popular articles</h2></div><span id="help-result-count">6 articles</span></div>
+              <div id="help-articles" class="help-articles">
+                <button data-help-article data-keywords="getting started Shopify product analysis link import"><span class="article-icon">01</span><span><b>Analyze your first Shopify product</b><small>Connect a public product URL and understand the intelligence report.</small></span><em>4 min →</em></button>
+                <button data-help-article data-keywords="Seedance video generation API key Seegen"><span class="article-icon">02</span><span><b>Generate a premium video with Seedance</b><small>Review prompts, submit a task, and retrieve the finished video.</small></span><em>6 min →</em></button>
+                <button data-help-article data-keywords="TikTok publishing schedule caption OAuth"><span class="article-icon">03</span><span><b>Prepare and schedule a TikTok post</b><small>Build captions, hashtags, privacy settings, and a publish time.</small></span><em>5 min →</em></button>
+                <button data-help-article data-keywords="API error 422 troubleshooting Seedance Seegen"><span class="article-icon">04</span><span><b>Resolve a 422 generation error</b><small>Check model fields, media inputs, and provider-specific request formats.</small></span><em>7 min →</em></button>
+                <button data-help-article data-keywords="brand kit logo colors fonts voice"><span class="article-icon">05</span><span><b>Build a reusable Brand Kit</b><small>Define the assets and rules applied to every new generation.</small></span><em>3 min →</em></button>
+                <button data-help-article data-keywords="account billing credits login Google email"><span class="article-icon">06</span><span><b>Understand credits and account access</b><small>Learn what is free, what consumes credits, and how projects are saved.</small></span><em>3 min →</em></button>
+              </div>
+              <div id="help-empty" class="empty-state" hidden>No help articles match your search.</div>
+
+              <section class="faq-section">
+                <div class="section-heading"><div><p class="eyebrow">QUICK ANSWERS</p><h2>Frequently asked questions</h2></div></div>
+                <details open><summary>Does ReelCraft use real Shopify product data?<span>＋</span></summary><p>Yes. Public Shopify product pages are parsed through the backend to retrieve listing data such as title, description, variants, pricing, and media. Review data requires a separate review provider.</p></details>
+                <details><summary>When does Seedance consume credits?<span>＋</span></summary><p>Credits are consumed only after you confirm a premium generation and the request is submitted to the configured provider. Starter videos remain free in this MVP.</p></details>
+                <details><summary>Can ReelCraft publish directly to TikTok?<span>＋</span></summary><p>The current MVP prepares and stores a complete publishing package. Direct posting requires TikTok OAuth and approval for the Content Posting API.</p></details>
+              </section>
+            </div>
+
+            <aside class="help-sidebar">
+              <section class="surface-card status-card">
+                <div class="card-heading"><div><p class="eyebrow">SYSTEM STATUS</p><h2>All systems operational</h2></div><i></i></div>
+                <ul><li><span></span>Shopify parser<b>Operational</b></li><li><span></span>Starter renderer<b>Operational</b></li><li><span></span>Seedance provider<b>Connected</b></li></ul>
+                <small>Last checked just now · Demo status</small>
+              </section>
+              <section class="support-card">
+                <span class="support-icon">?</span>
+                <p class="eyebrow">NEED A HUMAN?</p>
+                <h2>Talk to our support team.</h2>
+                <p>Share your product URL, task ID, and a screenshot so we can diagnose the issue faster.</p>
+                <button id="contact-support">Contact support <span>→</span></button>
+                <small>Typical reply time: under 4 hours</small>
+              </section>
+            </aside>
+          </div>
         </section>
       </main>
     </div>
