@@ -685,7 +685,7 @@ async function serveStatic(request, response) {
   }
 }
 
-const server = createServer(async (request, response) => {
+export async function handleRequest(request, response) {
   if (request.method === "GET" && request.url.startsWith("/api/shopify/product")) {
     try {
       const requestUrl = new URL(request.url, `http://${request.headers.host}`);
@@ -772,8 +772,11 @@ const server = createServer(async (request, response) => {
 
   if (request.method !== "GET") return sendJson(response, 405, { error: "Method not allowed" });
   await serveStatic(request, response);
-});
+}
 
-server.listen(port, () => {
-  console.log(`ReelCraft MVP running at http://127.0.0.1:${port}`);
-});
+if (!process.env.VERCEL) {
+  const server = createServer(handleRequest);
+  server.listen(port, () => {
+    console.log(`ReelCraft MVP running at http://127.0.0.1:${port}`);
+  });
+}
